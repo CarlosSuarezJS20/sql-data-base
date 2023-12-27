@@ -25,10 +25,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // storing the user in the req.for development process
 app.use((req, res, next) => {
-  User.findByPk(1)
+  User.findByPk(9)
     .then((user) => {
       req.user = user;
-      console.log("user", req.user);
       next();
     })
     .catch((err) => console.log(err));
@@ -46,18 +45,28 @@ Product.belongsTo(User);
 User.hasMany(Product);
 // Cart associations
 User.hasOne(Cart, { onDelete: "CASCADE", constraints: true });
-Cart.belongsTo(User);
+// Cart.belongsTo(User);
 
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
 
 // create tables by default and does not overrides\ for overriding you need to pass an object with a key: force and value true
 
+const createCartHelper = async (user) => {
+  try {
+    const cart = user.createCart();
+    console.log(cart.id);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // helper function to create a user on the fly until later when I create authetication
 const createUser = async (id) => {
   try {
     const user = await User.findByPk(id);
     if (user) {
+      app.listen(3000);
       return user;
     } else {
       const newUser = await User.create({
@@ -65,6 +74,8 @@ const createUser = async (id) => {
         email: "carlos@hotmail.com",
         role: "admin",
       });
+      createCartHelper(newUser);
+      app.listen(3000);
       return newUser;
     }
   } catch (error) {
@@ -76,10 +87,7 @@ sequelize
   .sync()
   .then((res) => {
     try {
-      const userDetected = createUser(1);
-      if (userDetected) {
-        app.listen(3000);
-      }
+      createUser(9);
     } catch (error) {
       console.log(error);
     }
