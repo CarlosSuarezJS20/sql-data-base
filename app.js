@@ -14,6 +14,8 @@ const Product = require("./models/product");
 const User = require("./models/user");
 const Cart = require("./models/cart");
 const CartItem = require("./models/cartItem");
+const Order = require("./models/order");
+const OrderItem = require("./models/orderItem");
 
 const app = express();
 
@@ -44,18 +46,23 @@ User.hasOne(Product, { constraints: true, onDelete: "CASCADE" });
 Product.belongsTo(User);
 User.hasMany(Product);
 // Cart associations
-User.hasOne(Cart, { onDelete: "CASCADE", constraints: true });
-// Cart.belongsTo(User);
+User.hasOne(Cart, { onDelete: "CASCADE", constraints: true, unique: true });
+Cart.belongsTo(User);
 
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
+// Order associations
+Order.belongsTo(User);
+User.hasMany(Order);
+
+Order.belongsToMany(Product, { through: OrderItem });
+Product.belongsToMany(Order, { through: OrderItem });
 
 // create tables by default and does not overrides\ for overriding you need to pass an object with a key: force and value true
 
 const createCartHelper = async (user) => {
   try {
     const cart = user.createCart();
-    console.log(cart.id);
   } catch (error) {
     console.log(error);
   }
@@ -84,7 +91,7 @@ const createUser = async (id) => {
 };
 
 sequelize
-  .sync()
+  .sync({ alter: true })
   .then((res) => {
     try {
       createUser(9);

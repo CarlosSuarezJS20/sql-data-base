@@ -16,9 +16,8 @@ exports.getCart = async (req, res) => {
     .catch((err) => console.log(err));
 };
 
-exports.postCart = (req, res, next) => {
+exports.postCart = (req, res) => {
   const prodId = req.body.productId;
-  let product;
   let fetchedCart;
   let newQuantity = 1;
 
@@ -33,10 +32,6 @@ exports.postCart = (req, res, next) => {
       if (products[0]) {
         const oldQuantity = products[0].cartItem.quantity;
         newQuantity = newQuantity + oldQuantity;
-
-        // return fetchedCart.addProduct(products[0], {
-        //   through: { quantity: newQuantity },
-        // });
         return products[0];
       }
       // add a brand new product to cart
@@ -53,10 +48,20 @@ exports.postCart = (req, res, next) => {
     .catch((error) => console.log(error));
 };
 
-exports.postCartDeleteProduct = (req, res, next) => {
-  //   const prodId = req.body.productId;
-  //   Product.findById(prodId, (product) => {
-  //     Cart.deleteProduct(prodId, product.price);
-  //     res.redirect("/cart");
-  //   });
+exports.postCartDeleteProduct = (req, res) => {
+  const productIdToDelete = req.body.productId;
+  req.user
+    .getCart()
+    .then((cart) => {
+      return cart;
+    })
+    .then((cart) => {
+      return cart.getProducts({ where: { id: productIdToDelete } });
+    })
+    .then((products) => {
+      const product = products[0];
+      product.cartItem.destroy();
+      res.redirect("/cart");
+    })
+    .catch((error) => console.log(error));
 };

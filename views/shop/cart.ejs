@@ -17,6 +17,12 @@
                             </form>
                         </li>
                     <% }) %>
+                    <li class="cart__item">
+                        <h1>Order Action</h1>
+                        <form action="/orders" method="GET">
+                            <button class="btn danger" type="submit">Order Now!</button>
+                        </form>
+                    </li>
                 </ul>
             <% } else { %>
                 <h1>No Products in Cart!</h1>
