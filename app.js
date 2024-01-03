@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // storing the user in the req.for development process
 app.use((req, res, next) => {
-  User.findByPk(9)
+  User.findByPk(10)
     .then((user) => {
       req.user = user;
       next();
@@ -91,10 +91,10 @@ const createUser = async (id) => {
 };
 
 sequelize
-  .sync({ alter: true })
+  .sync()
   .then((res) => {
     try {
-      createUser(9);
+      createUser(10);
     } catch (error) {
       console.log(error);
     }
