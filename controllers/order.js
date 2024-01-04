@@ -1,4 +1,16 @@
-exports.getOrders = (req, res) => {};
+exports.getOrders = (req, res) => {
+  req.user
+    .getOrders({ include: "products" })
+    .then((orders) => {
+      console.log(orders);
+      res.render("shop/orders", {
+        path: "/orders",
+        pageTitle: "Your Orders",
+        userOrders: orders,
+      });
+    })
+    .catch((err) => console.log(err));
+};
 
 exports.postOrder = (req, res) => {
   const currentUser = req.user;
@@ -21,11 +33,12 @@ exports.postOrder = (req, res) => {
       return currentUser.createOrder();
     })
     .then((order) => {
-      return products.forEach((prod) =>
-        order.addProduct(prod, {
-          through: { quantity: prod.cartItem.quantity },
-        })
-      );
+      // modified
+      const currentModelledProducts = products.map((prod) => {
+        prod.orderItem = { quantity: prod.cartItem.quantity };
+        return prod;
+      });
+      return order.addProducts(currentModelledProducts);
     })
     .then(() => {
       return currentCart.setProducts(null);

@@ -55,8 +55,8 @@ Product.belongsToMany(Cart, { through: CartItem });
 Order.belongsTo(User);
 User.hasMany(Order);
 
-Order.belongsToMany(Product, { through: OrderItem });
 Product.belongsToMany(Order, { through: OrderItem });
+Order.belongsToMany(Product, { through: OrderItem });
 
 // create tables by default and does not overrides\ for overriding you need to pass an object with a key: force and value true
 
